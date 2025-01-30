@@ -1,7 +1,14 @@
+// /home/ata/Projects/wordwise-ai/src/components/WordleBoard.jsx
 "use client";
 import React from "react";
 
-function WordleBoard({ guesses, handleGuessChange }) {
+const colorMap = {
+  GREEN: "#22c55e",   // Yeşil
+  YELLOW: "#facc15", // Sarı
+  WHITE: "#ffffff",  // Renksiz
+};
+
+function WordleBoard({ guesses, colors, handleGuessChange }) {
   return (
     <div 
       style={{ 
@@ -22,10 +29,7 @@ function WordleBoard({ guesses, handleGuessChange }) {
         Wordle Oyunu
       </h2>
       
-      {/* 
-        5 satır x 5 sütun (yani 25 kutu) 
-        Her satır = guesses[rowIndex]
-      */}
+      {/* 5 satır x 5 sütun */}
       <div 
         style={{
           display: "flex",
@@ -44,35 +48,41 @@ function WordleBoard({ guesses, handleGuessChange }) {
               gap: "12px"
             }}
           >
-            {row.map((letter, colIndex) => (
-              <input
-                key={`${rowIndex}-${colIndex}`}
-                value={letter}
-                onChange={(e) => handleGuessChange(rowIndex, colIndex, e.target.value)}
-                maxLength="1"
-                style={{
-                  width: "56px",
-                  height: "56px",
-                  textAlign: "center",
-                  fontSize: "24px",
-                  border: "2px solid #e2e8f0",
-                  borderRadius: "8px",
-                  background: "#ffffff",
-                  color: "#1e293b",
-                  fontWeight: "600",
-                  transition: "border-color 0.2s, box-shadow 0.2s",
-                  outline: "none"
-                }}
-                onFocus={(e) => {
-                  e.target.style.borderColor = "#3b82f6";
-                  e.target.style.boxShadow = "0 0 0 2px rgba(59, 130, 246, 0.2)";
-                }}
-                onBlur={(e) => {
-                  e.target.style.borderColor = "#e2e8f0";
-                  e.target.style.boxShadow = "none";
-                }}
-              />
-            ))}
+            {row.map((letter, colIndex) => {
+              // colors parametresi de 5x5’lik bir 2D array
+              const colorKey = colors[rowIndex][colIndex]; // "GREEN", "YELLOW", "WHITE"
+              const bgColor = colorMap[colorKey] || "#ffffff";
+
+              return (
+                <input
+                  key={`${rowIndex}-${colIndex}`}
+                  value={letter}
+                  onChange={(e) => handleGuessChange(rowIndex, colIndex, e.target.value)}
+                  maxLength="1"
+                  style={{
+                    width: "56px",
+                    height: "56px",
+                    textAlign: "center",
+                    fontSize: "24px",
+                    border: "2px solid #e2e8f0",
+                    borderRadius: "8px",
+                    background: bgColor,
+                    color: "#1e293b",
+                    fontWeight: "600",
+                    transition: "border-color 0.2s, box-shadow 0.2s",
+                    outline: "none"
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = "#3b82f6";
+                    e.target.style.boxShadow = "0 0 0 2px rgba(59, 130, 246, 0.2)";
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = "#e2e8f0";
+                    e.target.style.boxShadow = "none";
+                  }}
+                />
+              );
+            })}
           </div>
         ))}
       </div>

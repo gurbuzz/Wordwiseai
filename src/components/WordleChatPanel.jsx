@@ -1,5 +1,3 @@
-// /home/ata/Projects/wordwise-ai/src/components/WordleChatPanel.jsx
-
 "use client";
 import React, { useState } from "react";
 import { sendOllamaChat, log } from "../services/chatService";
@@ -8,9 +6,8 @@ function WordleChatPanel({ onWordParsed }) {
   const [prompt, setPrompt] = useState("");
   const [promptResult, setPromptResult] = useState("");
   const [loading, setLoading] = useState(false);
-  const WORKSPACE_SLUG = "deepseek"; // Sabit workspace slug
+  const WORKSPACE_SLUG = "deepseek";
 
-  // Gelen yanıttan 5 harfli bir kelimeyi ayıklayan basit yardımcı fonksiyon
   const parseWord = (response) => {
     if (!response) return "";
     let trimmed = response.trim();
@@ -20,7 +17,17 @@ function WordleChatPanel({ onWordParsed }) {
     return trimmed;
   };
 
+  // Enter tuşu için yeni handler
+  const handleTextareaKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey && !loading) {
+      e.preventDefault(); // Yeni satır eklemeyi engelle
+      handlePromptSubmit();
+    }
+  };
+
   const handlePromptSubmit = async () => {
+    if (loading || !prompt.trim()) return;
+    
     setLoading(true);
     try {
       const data = await sendOllamaChat(WORKSPACE_SLUG, {
@@ -32,17 +39,13 @@ function WordleChatPanel({ onWordParsed }) {
         const responseText = data.textResponse;
         setPromptResult(responseText);
 
-        // Burada otomatik olarak wordle tahmin kutucuklarını dolduruyoruz
         const parsed = parseWord(responseText);
-        // Kelime tam 5 harfse ve sadece harflerden oluşuyorsa dolduralım
         if (parsed.length === 5) {
-          // WordleGame'e bu harf dizisini gönder
           onWordParsed(parsed.toUpperCase().split(""));
+          setPrompt(""); // Input'u temizle
         }
       } else if (data?.error) {
         setPromptResult(`Hata: ${data.error}`);
-      } else {
-        setPromptResult("Geçersiz yanıt formatı alındı.");
       }
     } catch (error) {
       setPromptResult(error.message || "Bir hata oluştu. Lütfen tekrar deneyin.");
@@ -71,6 +74,7 @@ function WordleChatPanel({ onWordParsed }) {
       <textarea
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
+        onKeyDown={handleTextareaKeyDown} // Yeni eklenen satır
         placeholder="Ollama'ya sorunuzu yazın..."
         style={{ 
           width: "100%", 
