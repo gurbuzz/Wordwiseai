@@ -4,27 +4,36 @@ import WordleChatPanel from "../components/WordleChatPanel";
 import WordleBoard from "../components/WordleBoard";
 
 function WordleGame() {
-  // 5 kutu için:
-  // const [guesses, setGuesses] = useState(["", "", "", "", ""]);
+  // 5 satır x 5 sütun => 2 boyutlu array
+  // Her row = ["", "", "", "", ""]
+  // Toplam 5 row = 5 deneme
+  const initialGuesses = Array(5).fill("").map(() => Array(5).fill(""));
 
-  // 25 kutu için:
-  const [guesses, setGuesses] = useState(Array(25).fill(""));
-  
-  // Senin Wordle dizin kaç kutu olacaksa, ona göre ayarla. 
-  // Bu örnekte 5 kutu tutalım:
-  //const [guesses, setGuesses] = useState(["", "", "", "", ""]);
-
-
-  // ChatPanel'den 5 harfli kelime gelince guesses'i otomatik doldur.
-  const handleWordParsed = (letters) => {
-    setGuesses(letters);
-  };
+  const [guesses, setGuesses] = useState(initialGuesses);
+  const [currentRow, setCurrentRow] = useState(0);
 
   // WordleBoard'daki input değiştiğinde
-  const handleGuessChange = (index, value) => {
-    const newGuesses = [...guesses];
-    newGuesses[index] = value.toUpperCase();
-    setGuesses(newGuesses);
+  const handleGuessChange = (rowIndex, colIndex, value) => {
+    // Manuel olarak ilgili kutuyu güncelle
+    const updatedGuesses = [...guesses];
+    // İç içe dizi kopyasını daha güvenli yapmak istersen slice kullanabilirsin
+    updatedGuesses[rowIndex] = [...updatedGuesses[rowIndex]];
+
+    updatedGuesses[rowIndex][colIndex] = value.toUpperCase();
+    setGuesses(updatedGuesses);
+  };
+
+  // Soldaki panelden 5 harfli kelime gelince
+  // 1) O kelimeyi mevcut satıra yaz
+  // 2) Bir alt satıra geç (currentRow + 1)
+  const handleWordParsed = (letters) => {
+    // Örneğin letters = ["C","L","E","A","N"]
+    if (currentRow < 5) {
+      const updatedGuesses = [...guesses];
+      updatedGuesses[currentRow] = letters;
+      setGuesses(updatedGuesses);
+      setCurrentRow(currentRow + 1); // Bir alt satıra geç
+    }
   };
 
   return (
@@ -38,7 +47,7 @@ function WordleGame() {
       <WordleChatPanel onWordParsed={handleWordParsed} />
 
       {/* Sağ taraf: Wordle Oyunu */}
-      <WordleBoard 
+      <WordleBoard
         guesses={guesses}
         handleGuessChange={handleGuessChange}
       />
