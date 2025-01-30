@@ -1,0 +1,64 @@
+// components/ChatComponent.jsx
+import React, { useState } from 'react';
+import { sendOllamaChat, log } from '../services/chatService';
+
+const ChatComponent = () => {
+  const [prompt, setPrompt] = useState('');
+  const [response, setResponse] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const workspaceSlug = "deepseek"; // Sabit slug
+
+  const handleSendPrompt = async () => {
+    if (!prompt.trim()) {
+      setResponse('Lütfen geçerli bir mesaj girin.');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const data = await sendOllamaChat(workspaceSlug, {
+        message: prompt,
+        sessionId: 'user-session-123' // Oturum yönetimi için
+      });
+
+      if (data?.textResponse) {
+        setResponse(data.textResponse);
+      } else if (data?.error) {
+        setResponse(`Hata: ${data.error}`);
+      }
+    } catch (error) {
+      setResponse(`Hata: ${error.message}`);
+      log('ERROR', 'İstek hatası', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="chat-container">
+      <h2>Ollama 3.1:8b ile Sohbet</h2>
+      <div className="input-section">
+        <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Mesajınızı yazın..."
+          disabled={isLoading}
+        />
+        <button onClick={handleSendPrompt} disabled={isLoading}>
+          {isLoading ? 'Gönderiliyor...' : 'Gönder'}
+        </button>
+      </div>
+      
+      {response && (
+        <div className="response-section">
+          <h3>Yanıt:</h3>
+          <div className="response-content">
+            {response}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ChatComponent;
