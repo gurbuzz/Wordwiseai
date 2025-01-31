@@ -26,7 +26,7 @@ function WordleBoard({ guesses, colors, handleGuessChange }) {
           marginBottom: "24px" 
         }}
       >
-        Wordle Oyunu
+        Find the word using the CHAT panel
       </h2>
       
       {/* 5 satır x 5 sütun */}

@@ -48,8 +48,8 @@ function WordleChatPanel({ onWordParsed }) {
         setPromptResult(`Hata: ${data.error}`);
       }
     } catch (error) {
-      setPromptResult(error.message || "Bir hata oluştu. Lütfen tekrar deneyin.");
-      log("ERROR", "handlePromptSubmit hata", error);
+      setPromptResult(error.message || "An error occurred. Please try again.");
+      log("ERROR", "handlePromptSubmit error", error);
     } finally {
       setLoading(false);
     }
@@ -69,13 +69,13 @@ function WordleChatPanel({ onWordParsed }) {
         color: "#1e293b", 
         marginBottom: "24px" 
       }}>
-        Ollama Sohbet
+        CHAT panel
       </h2>
       <textarea
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
         onKeyDown={handleTextareaKeyDown} // Yeni eklenen satır
-        placeholder="Ollama'ya sorunuzu yazın..."
+        placeholder="You can try words by entering the prompt"
         style={{ 
           width: "100%", 
           height: "120px", 
@@ -108,7 +108,7 @@ function WordleChatPanel({ onWordParsed }) {
         }}
         disabled={loading}
       >
-        {loading ? "Yanıt Bekleniyor..." : "Ollama'ya Sor"}
+        {loading ? "Waiting for Response..." : "Send"}
       </button>
       
       {promptResult && (
