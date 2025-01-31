@@ -2,9 +2,10 @@
 import React, { useState } from "react";
 import WordleChatPanel from "../components/WordleChatPanel";
 import WordleBoard from "../components/WordleBoard";
+import SettingsPanel from "../components/SettingsPanel";
 
 function WordleGame() {
-  // Oyun state'leri
+  // Game states
   const initialGuesses = Array(5).fill("").map(() => Array(5).fill(""));
   const initialColors = Array(5).fill("").map(() => Array(5).fill("WHITE"));
   
@@ -13,7 +14,12 @@ function WordleGame() {
   const [currentRow, setCurrentRow] = useState(0);
   const solution = "CLEAN";
 
-  // Satır kontrol fonksiyonu
+  // New state for dark mode, login and settings panel control
+  const [darkMode, setDarkMode] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
+  // Function to check a row's guess against the solution
   const checkRow = (rowIndex, rowLettersParam) => {
     const rowLetters = rowLettersParam || guesses[rowIndex];
     const solutionArray = solution.split('');
@@ -24,7 +30,7 @@ function WordleGame() {
 
     let rowResult = Array(5).fill("WHITE");
 
-    // 1. Pass: Yeşil eşleşmeler
+    // First pass: Green matches (correct letter and position)
     solutionArray.forEach((solutionChar, i) => {
       if (rowLetters[i] === solutionChar) {
         rowResult[i] = "GREEN";
@@ -32,7 +38,7 @@ function WordleGame() {
       }
     });
 
-    // 2. Pass: Sarı eşleşmeler
+    // Second pass: Yellow matches (correct letter, wrong position)
     rowLetters.forEach((guessChar, i) => {
       if (rowResult[i] === "GREEN") return;
       if (solutionFreq[guessChar] > 0) {
@@ -48,7 +54,7 @@ function WordleGame() {
     });
   };
 
-  // Input değişiklik handler'ı
+  // Handler for input changes
   const handleGuessChange = (rowIndex, colIndex, value) => {
     const updatedGuesses = [...guesses];
     updatedGuesses[rowIndex] = [...updatedGuesses[rowIndex]];
@@ -60,7 +66,7 @@ function WordleGame() {
     }
   };
 
-  // Kelime parse edildiğinde
+  // Handler when a word is parsed from the chat panel
   const handleWordParsed = (letters) => {
     if (currentRow < 5) {
       const updatedGuesses = [...guesses];
@@ -72,24 +78,34 @@ function WordleGame() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className={`h-screen flex flex-col ${darkMode ? "bg-gray-900" : "bg-gray-50"}`}>
       {/* Top Navigation Bar */}
-      <nav className="bg-white shadow-sm fixed w-full z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <nav className={`${darkMode ? "bg-gray-800" : "bg-white"} shadow-sm fixed w-full z-10`}>
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
           <div className="flex justify-between items-center h-16">
-            {/* Sol Taraf - Logo */}
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl font-bold text-indigo-600">WORDWISE AI</span>
+            {/* Left Side - Logo */}
+            <div className="flex-1 text-center">
+              <span className={`text-3xl font-bold ${darkMode ? "text-indigo-400" : "text-indigo-600"}`}>
+                WORDWISE AI
+              </span>
             </div>
 
-            {/* Sağ Taraf - Navigasyon */}
-            <div className="flex items-center space-x-4">
-              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                <span className="text-gray-600">Login</span>
+            {/* Right Side - Navigation */}
+            <div className="flex items-center space-x-6">
+              <button 
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                onClick={() => setIsLoggedIn(!isLoggedIn)}
+              >
+                <span className={`${darkMode ? "text-gray-200" : "text-gray-600"}`}>
+                  {isLoggedIn ? "Logout" : "Login"}
+                </span>
               </button>
-              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+              <button 
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                onClick={() => setShowSettings(true)}
+              >
                 <svg 
-                  className="w-6 h-6 text-gray-600" 
+                  className={`w-7 h-7 ${darkMode ? "text-gray-200" : "text-gray-600"}`} 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -114,26 +130,36 @@ function WordleGame() {
       </nav>
 
       {/* Main Content */}
-      <main className="flex-1 pt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Sohbet Paneli */}
-            <div className="lg:w-96">
-              <WordleChatPanel onWordParsed={handleWordParsed} />
+      <main className="flex-1 pt-20">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-10">
+          <div className="flex flex-col lg:flex-row gap-10">
+            {/* Chat Panel */}
+            <div className="lg:w-1/3">
+              <WordleChatPanel onWordParsed={handleWordParsed} darkMode={darkMode} />
             </div>
-            {/* Oyun Tahtası */}
+            {/* Game Board */}
             <div className="flex-1">
               <WordleBoard
                 guesses={guesses}
                 colors={colors}
                 handleGuessChange={handleGuessChange}
+                darkMode={darkMode}
               />
             </div>
-
-
           </div>
         </div>
       </main>
+
+      {/* Settings Panel */}
+      {showSettings && (
+        <SettingsPanel 
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+          isLoggedIn={isLoggedIn}
+          setIsLoggedIn={setIsLoggedIn}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
     </div>
   );
 }
