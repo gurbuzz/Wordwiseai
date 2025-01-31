@@ -2,35 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: 255 255 255;
+    --foreground: 23 23 23;
   }
-}
 
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  margin: 0;
-  padding: 0;
-}
-input {
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-button {
-  background-color: #0070f3;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-button:hover {
-  background-color: #005bb5;
+  .dark {
+    --background: 10 10 10;
+    --foreground: 237 237 237;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
 }
