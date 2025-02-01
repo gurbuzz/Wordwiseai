@@ -3,16 +3,28 @@
 @tailwind utilities;
 
 @layer base {
+  /* CSS değişkenlerinin (variables) temel tanımı */
   :root {
     --background: 255 255 255;
     --foreground: 23 23 23;
   }
 
+  /* Dark mode aktif olduğunda kullanacağımız değişken değerleri */
   .dark {
     --background: 10 10 10;
     --foreground: 237 237 237;
   }
 
+  /* Tailwind'in bilmediği özel sınıfları burada tanımlıyoruz */
+  .bg-background {
+    background-color: rgb(var(--background));
+  }
+  
+  .text-foreground {
+    color: rgb(var(--foreground));
+  }
+
+  /* Body üzerinde toplu şekilde uygulama yapıyoruz */
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
