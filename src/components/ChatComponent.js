@@ -36,7 +36,6 @@ const ChatComponent = () => {
 
   return (
     <div className="chat-container">
-      <h2>Ollama 3.1:8b ile Sohbet</h2>
       <div className="input-section">
         <textarea
           value={prompt}
