@@ -1,17 +1,18 @@
 "use client";
-import { useApp } from "../context/AppContext";
+import React, { useState } from "react";
+import { AppProvider, useApp } from "../context/AppContext";
 import WordleChatPanel from "../components/WordleChatPanel";
 import WordleBoard from "../components/WordleBoard";
 import SettingsPanel from "../components/SettingsPanel";
-import { useState } from "react";
 
-// Sonuç paneli bileşeni: oyunu kazandığında overlay olarak açılır
 function ResultPanel({ promptCount, attemptCount, onRestart, darkMode }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div
         className={`p-10 rounded-lg text-center ${
-          darkMode ? "bg-gray-800 bg-opacity-90 text-white" : "bg-white bg-opacity-90 text-gray-900"
+          darkMode
+            ? "bg-gray-800 bg-opacity-90 text-white"
+            : "bg-white bg-opacity-90 text-gray-900"
         }`}
       >
         <h2 className="text-2xl font-bold mb-4">Congratulations!</h2>
@@ -29,18 +30,21 @@ function ResultPanel({ promptCount, attemptCount, onRestart, darkMode }) {
   );
 }
 
-export default function Home() {
+function HomeContent() {
   const { darkMode } = useApp();
   const [guesses, setGuesses] = useState(
-    Array(5).fill("").map(() => Array(5).fill(""))
+    Array(5)
+      .fill("")
+      .map(() => Array(5).fill(""))
   );
   const [colors, setColors] = useState(
-    Array(5).fill("").map(() => Array(5).fill("WHITE"))
+    Array(5)
+      .fill("")
+      .map(() => Array(5).fill("WHITE"))
   );
   const [currentRow, setCurrentRow] = useState(0);
   const solution = "CLEAN";
 
-  // Yeni durumlar: prompt ve attempt sayıları, oyunun kazanılmış olması
   const [promptCount, setPromptCount] = useState(0);
   const [attemptCount, setAttemptCount] = useState(0);
   const [gameWon, setGameWon] = useState(false);
@@ -90,7 +94,6 @@ export default function Home() {
 
   const handleWordParsed = (letters) => {
     if (currentRow < 5 && !gameWon) {
-      // Her geçerli kelime denemesinde prompt ve attempt sayılarını artırıyoruz
       setPromptCount((prev) => prev + 1);
       setAttemptCount((prev) => prev + 1);
 
@@ -99,7 +102,6 @@ export default function Home() {
       setGuesses(updatedGuesses);
       checkRow(currentRow, letters);
 
-      // Doğru kelime bulunduysa oyunu kazanmış oluyoruz
       if (letters.join("") === solution) {
         setGameWon(true);
       }
@@ -108,10 +110,17 @@ export default function Home() {
     }
   };
 
-  // Oyunu sıfırlamak için
   const resetGame = () => {
-    setGuesses(Array(5).fill("").map(() => Array(5).fill("")));
-    setColors(Array(5).fill("").map(() => Array(5).fill("WHITE")));
+    setGuesses(
+      Array(5)
+        .fill("")
+        .map(() => Array(5).fill(""))
+    );
+    setColors(
+      Array(5)
+        .fill("")
+        .map(() => Array(5).fill("WHITE"))
+    );
     setCurrentRow(0);
     setPromptCount(0);
     setAttemptCount(0);
@@ -119,7 +128,11 @@ export default function Home() {
   };
 
   return (
-    <div className={`h-screen flex flex-col ${darkMode ? "bg-gray-900" : "bg-gray-50"}`}>
+    <div
+      className={`h-screen flex flex-col ${
+        darkMode ? "bg-gray-900" : "bg-gray-50"
+      }`}
+    >
       <main className="flex-1 pt-20">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-10">
           <div className="flex flex-col lg:flex-row gap-10">
@@ -147,5 +160,13 @@ export default function Home() {
         />
       )}
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <AppProvider>
+      <HomeContent />
+    </AppProvider>
   );
 }

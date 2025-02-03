@@ -1,16 +1,17 @@
-// components/ChatComponent.jsx
-import React, { useState } from 'react';
-import { sendOllamaChat, log } from '../services/chatService';
+import React, { useState } from "react";
+import { sendOllamaChat, log } from "../services/chatService";
+import { useApp } from "../context/AppContext";
 
 const ChatComponent = () => {
-  const [prompt, setPrompt] = useState('');
-  const [response, setResponse] = useState('');
+  const { sessionId } = useApp();
+  const [prompt, setPrompt] = useState("");
+  const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const workspaceSlug = "deepseek"; // Sabit slug
+  const workspaceSlug = "deepseek";
 
   const handleSendPrompt = async () => {
     if (!prompt.trim()) {
-      setResponse('Lütfen geçerli bir mesaj girin.');
+      setResponse("Lütfen geçerli bir mesaj girin.");
       return;
     }
 
@@ -18,7 +19,7 @@ const ChatComponent = () => {
     try {
       const data = await sendOllamaChat(workspaceSlug, {
         message: prompt,
-        sessionId: 'user-session-123' // Oturum yönetimi için
+        sessionId: sessionId,
       });
 
       if (data?.textResponse) {
@@ -28,7 +29,7 @@ const ChatComponent = () => {
       }
     } catch (error) {
       setResponse(`Hata: ${error.message}`);
-      log('ERROR', 'İstek hatası', error);
+      log("ERROR", "İstek hatası", error);
     } finally {
       setIsLoading(false);
     }
@@ -44,16 +45,14 @@ const ChatComponent = () => {
           disabled={isLoading}
         />
         <button onClick={handleSendPrompt} disabled={isLoading}>
-          {isLoading ? 'Gönderiliyor...' : 'Gönder'}
+          {isLoading ? "Gönderiliyor..." : "Gönder"}
         </button>
       </div>
-      
+
       {response && (
         <div className="response-section">
           <h3>Yanıt:</h3>
-          <div className="response-content">
-            {response}
-          </div>
+          <div className="response-content">{response}</div>
         </div>
       )}
     </div>
