@@ -1,11 +1,50 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const colorMap = {
-  GREEN: "#22c55e",   // Green
-  YELLOW: "#facc15",  // Yellow
-  WHITE: "#ffffff",   // White
+  GREEN: "#22c55e",   // Yeşil
+  YELLOW: "#facc15",  // Sarı
+  WHITE: "#ffffff",   // Beyaz
 };
+
+function AnimatedCell({ letter, colorKey, delay, darkMode }) {
+  const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    // Her yeni harf geldiğinde animasyonu sıfırla
+    setRevealed(false);
+    const timer = setTimeout(() => {
+      setRevealed(true);
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [letter, delay]);
+
+  // Finalde uygulanacak arka plan rengi
+  const finalBgColor = colorMap[colorKey] || (darkMode ? "#1e293b" : "#ffffff");
+  // Başlangıç rengi: burada, örneğin, henüz açılmamışsa mevcut arka plan kullanılıyor
+  const initialBgColor = darkMode ? "#1e293b" : "#ffffff";
+
+  const cellStyle = {
+    width: "64px",
+    height: "64px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "28px",
+    fontWeight: "700",
+    border: darkMode ? "2px solid #374151" : "2px solid #e2e8f0",
+    borderRadius: "12px",
+    // Delay tamamlanana kadar başlangıç rengi, sonra final rengi
+    background: revealed ? finalBgColor : initialBgColor,
+    color: darkMode ? "#e2e8f0" : "#1e293b",
+    // Hem arka plan rengi hem de içerik opacity animasyonu
+    transition: "opacity 0.5s ease, background-color 0.5s ease",
+    opacity: revealed ? 1 : 0,
+    fontFamily: "inherit",
+  };
+
+  return <div style={cellStyle}>{revealed ? letter : ""}</div>;
+}
 
 function WordleBoard({ guesses, colors, darkMode }) {
   const boardStyle = {
@@ -31,48 +70,29 @@ function WordleBoard({ guesses, colors, darkMode }) {
     margin: "0 auto",
   };
 
-  const cellStyle = (bgColor) => ({
-    width: "64px",
-    height: "64px",
-    textAlign: "center",
-    fontSize: "28px",
-    border: darkMode ? "2px solid #374151" : "2px solid #e2e8f0",
-    borderRadius: "12px",
-    background: bgColor,
-    color: darkMode ? "#e2e8f0" : "#1e293b",
-    fontWeight: "700",
-    transition: "border-color 0.2s, box-shadow 0.2s",
-    outline: "none",
-    fontFamily: "inherit",
-  });
-
   return (
     <div style={boardStyle}>
-      <h2 style={headingStyle}>
-        Find the Word Using the Chat Panel
-      </h2>
-      
+      <h2 style={headingStyle}>Find the Word Using the Chat Panel</h2>
       <div style={gridStyle}>
         {guesses.map((row, rowIndex) => (
-          <div 
+          <div
             key={rowIndex}
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(5, 1fr)",
-              gap: "16px"
+              gap: "16px",
             }}
           >
             {row.map((letter, colIndex) => {
-              const colorKey = colors[rowIndex][colIndex];
-              const bgColor = colorMap[colorKey] || (darkMode ? "#1e293b" : "#ffffff");
-
+              // Her kutu için delay, örn: 0ms, 300ms, 600ms, ...
+              const delay = colIndex * 300;
               return (
-                <input
-                  key={`${rowIndex}-${colIndex}`}
-                  value={letter}
-                  readOnly
-                  maxLength="1"
-                  style={cellStyle(bgColor)}
+                <AnimatedCell
+                  key={`${rowIndex}-${colIndex}-${letter}`}
+                  letter={letter}
+                  colorKey={colors[rowIndex][colIndex]}
+                  delay={delay}
+                  darkMode={darkMode}
                 />
               );
             })}

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { AppProvider, useApp } from "../context/AppContext";
+import AiModelPanel from "../components/AiModelPanel";
 import WordleChatPanel from "../components/WordleChatPanel";
 import WordleBoard from "../components/WordleBoard";
 import SettingsPanel from "../components/SettingsPanel";
@@ -81,17 +82,6 @@ function HomeContent() {
     });
   };
 
-  const handleGuessChange = (rowIndex, colIndex, value) => {
-    const updatedGuesses = [...guesses];
-    updatedGuesses[rowIndex] = [...updatedGuesses[rowIndex]];
-    updatedGuesses[rowIndex][colIndex] = value.toUpperCase();
-    setGuesses(updatedGuesses);
-
-    if (updatedGuesses[rowIndex].every(Boolean)) {
-      checkRow(rowIndex, updatedGuesses[rowIndex]);
-    }
-  };
-
   const handleWordParsed = (letters) => {
     if (currentRow < 5 && !gameWon) {
       setPromptCount((prev) => prev + 1);
@@ -136,14 +126,16 @@ function HomeContent() {
       <main className="flex-1 pt-20">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-10">
           <div className="flex flex-col lg:flex-row gap-10">
+            <div className="lg:w-1/5">
+              <AiModelPanel />
+            </div>
             <div className="lg:w-1/3">
               <WordleChatPanel onWordParsed={handleWordParsed} darkMode={darkMode} />
             </div>
-            <div className="flex-1">
+            <div className="lg:w-1/2">
               <WordleBoard
                 guesses={guesses}
                 colors={colors}
-                handleGuessChange={handleGuessChange}
                 darkMode={darkMode}
               />
             </div>

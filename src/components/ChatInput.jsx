@@ -75,7 +75,7 @@ const ChatInput = ({
           {loading ? "Waiting for Response..." : "Send"}
         </button>
         <button onClick={onRefresh} style={refreshButtonStyle}>
-          Refresh
+          Refresh 
           {isRefreshing && <span className="spinner" />}
         </button>
       </div>
