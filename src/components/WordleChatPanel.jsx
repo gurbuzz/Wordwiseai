@@ -2,40 +2,10 @@
 import React, { useState } from "react";
 import { sendOllamaChat, log } from "../services/chatService";
 import { useApp } from "../context/AppContext";
+import ChatInput from "./ChatInput";
+import ChatOutput from "./ChatOutput";
 
-function SlidingText({ text }) {
-  return (
-    <div className="sliding-text-container">
-      {text.split("").map((char, index) => (
-        <span
-          key={index}
-          className="sliding-letter"
-          style={{ animationDelay: `${index * 0.1}s` }}
-        >
-          {char}
-        </span>
-      ))}
-      <style jsx>{`
-        .sliding-text-container {
-          display: inline-block;
-        }
-        .sliding-letter {
-          opacity: 0;
-          transform: translateX(-20px);
-          animation: slideIn 0.5s forwards;
-        }
-        @keyframes slideIn {
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-      `}</style>
-    </div>
-  );
-}
-
-function WordleChatPanel({ onWordParsed, darkMode }) {
+const WordleChatPanel = ({ onWordParsed, darkMode }) => {
   const [prompt, setPrompt] = useState("");
   const [promptResult, setPromptResult] = useState("");
   const [loading, setLoading] = useState(false);
@@ -60,14 +30,12 @@ function WordleChatPanel({ onWordParsed, darkMode }) {
 
   const handlePromptSubmit = async () => {
     if (loading || !prompt.trim()) return;
-
     setLoading(true);
     try {
       const data = await sendOllamaChat(prompt);
       if (data?.response) {
         const responseText = data.response;
         setPromptResult(responseText);
-
         const parsed = parseWord(responseText);
         if (parsed.length === 5) {
           onWordParsed(parsed.toUpperCase().split(""));
@@ -77,9 +45,7 @@ function WordleChatPanel({ onWordParsed, darkMode }) {
         setPromptResult(`Error: ${data.error}`);
       }
     } catch (error) {
-      setPromptResult(
-        error.message || "An error occurred. Please try again."
-      );
+      setPromptResult(error.message || "An error occurred. Please try again.");
       log("ERROR", "handlePromptSubmit error", error);
     } finally {
       setLoading(false);
@@ -104,68 +70,6 @@ function WordleChatPanel({ onWordParsed, darkMode }) {
     height: "100%",
   };
 
-  const inputSectionStyle = {
-    marginBottom: "24px",
-  };
-
-  const textareaStyle = {
-    width: "100%",
-    height: "160px",
-    marginBottom: "20px",
-    padding: "16px",
-    borderRadius: "12px",
-    border: darkMode ? "1px solid #4b5563" : "1px solid #e2e8f0",
-    fontSize: "18px",
-    resize: "none",
-    outline: "none",
-    transition: "border-color 0.2s",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.08)",
-    backgroundColor: darkMode ? "#374151" : "#ffffff",
-    color: darkMode ? "#e2e8f0" : "#1e293b",
-    fontFamily: "inherit",
-  };
-
-  const buttonStyle = {
-    padding: "14px 28px",
-    cursor: "pointer",
-    backgroundColor: loading ? "#94a3b8" : (darkMode ? "#2563eb" : "#3b82f6"),
-    color: "#fff",
-    border: "none",
-    borderRadius: "12px",
-    fontWeight: "600",
-    fontSize: "18px",
-    transition: "background-color 0.2s",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-  };
-
-  const refreshButtonStyle = {
-    padding: "14px 28px",
-    cursor: "pointer",
-    backgroundColor: loading ? "#94a3b8" : (darkMode ? "#2563eb" : "#3b82f6"),
-    color: "#fff",
-    border: "none",
-    borderRadius: "12px",
-    fontWeight: "600",
-    fontSize: "18px",
-    transition: "background-color 0.2s",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    marginLeft: "10px",
-    animation: isRefreshing ? "blink 1s infinite" : "none",
-  };
-
-  const responseAreaStyle = {
-    flex: 1,
-    padding: "20px",
-    background: darkMode ? "#374151" : "#f1f5f9",
-    border: darkMode ? "1px solid #4b5563" : "1px solid #e2e8f0",
-    borderRadius: "12px",
-    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.08)",
-    color: darkMode ? "#e2e8f0" : "#475569",
-    fontSize: "18px",
-    lineHeight: 1.6,
-    overflowY: "auto",
-  };
-
   return (
     <div style={panelStyle}>
       <h2
@@ -178,70 +82,19 @@ function WordleChatPanel({ onWordParsed, darkMode }) {
       >
         Chat Panel
       </h2>
-      <div style={inputSectionStyle}>
-        <textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          onKeyDown={handleTextareaKeyDown}
-          placeholder="Enter your guess here..."
-          style={textareaStyle}
-          onFocus={(e) =>
-            (e.target.style.borderColor = darkMode ? "#3b82f6" : "#3b82f6")
-          }
-          onBlur={(e) =>
-            (e.target.style.borderColor = darkMode ? "#4b5563" : "#e2e8f0")
-          }
-        />
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <button onClick={handlePromptSubmit} style={buttonStyle} disabled={loading}>
-            {loading ? "Waiting for Response..." : "Send"}
-          </button>
-          <button onClick={handleRefresh} style={refreshButtonStyle}>
-            Refresh
-            {isRefreshing && <span className="spinner" />}
-          </button>
-        </div>
-      </div>
-      <div style={responseAreaStyle}>
-        {loading ? (
-          <SlidingText text="Awaiting response..." />
-        ) : (
-          promptResult || ""
-        )}
-      </div>
-      <style jsx>{`
-        @keyframes blink {
-          0% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.5;
-          }
-          100% {
-            opacity: 1;
-          }
-        }
-        @keyframes spin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-        .spinner {
-          display: inline-block;
-          width: 16px;
-          height: 16px;
-          border: 2px solid transparent;
-          border-top-color: #fff;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-          margin-left: 8px;
-        }
-      `}</style>
+      <ChatInput
+        prompt={prompt}
+        onPromptChange={setPrompt}
+        onSend={handlePromptSubmit}
+        onRefresh={handleRefresh}
+        onTextareaKeyDown={handleTextareaKeyDown}
+        loading={loading}
+        isRefreshing={isRefreshing}
+        darkMode={darkMode}
+      />
+      <ChatOutput promptResult={promptResult} loading={loading} darkMode={darkMode} />
     </div>
   );
-}
+};
 
 export default WordleChatPanel;
