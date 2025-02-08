@@ -1,37 +1,39 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:3001/api/v1/workspace";
-const API_KEY = "QQ199VG-D5F48RE-NRM0EZ7-B9YZSFW";
+const OLLAMA_URL = "http://localhost:11434/api/generate";
 
 export const log = (type, message, data = null) => {
   console.log(`[${new Date().toISOString()}] [${type}] ${message}`, data || "");
 };
 
-export const sendOllamaChat = async (workspaceSlug, body = {}) => {
-  log("INFO", `Ollama sohbeti başlatılıyor: ${workspaceSlug}`, body);
+export const sendOllamaChat = async (prompt) => {
+  log("INFO", "Ollama chat started.", { prompt });
+
+  const prefixInstruction = "If you are asked to test a word, then only respond with the word as your answer and nothing else. Otherwise, respond normally.";
+  const finalPrompt = `${prefixInstruction}\n\nPrompt: ${prompt}`;
+
+  const requestBody = {
+    model: "llama3.1:8b",
+    prompt: finalPrompt,
+    stream: false,
+    max_tokens: 300,
+  };
+
+  log("DEBUG", "Ollama API request body", requestBody);
 
   try {
-    const response = await axios.post(
-      `${BASE_URL}/${workspaceSlug}/chat`,
-      {
-        ...body,
-        mode: "chat",
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          ...(API_KEY && { Authorization: `Bearer ${API_KEY}` }),
-        },
-      }
-    );
-
-    log("INFO", "Başarılı yanıt", response.data);
+    log("INFO", "Sending request to Ollama API", { url: OLLAMA_URL });
+    const response = await axios.post(OLLAMA_URL, requestBody, {
+      headers: { "Content-Type": "application/json" },
+    });
+    log("INFO", "Received response from Ollama API", response.data);
     return response.data;
   } catch (error) {
-    log("ERROR", "API hatası", {
+    log("ERROR", "Error during Ollama API request", {
       status: error.response?.status,
       data: error.response?.data,
+      message: error.message,
     });
-    throw new Error(error.response?.data?.error || "Sunucu hatası");
+    throw new Error(error.response?.data?.error || "Server error");
   }
 };

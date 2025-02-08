@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { sendOllamaChat, log } from "../services/chatService";
 import { useApp } from "../context/AppContext";
 
-// Harf harf kayan animasyonu uygulayan küçük bir bileşen
 function SlidingText({ text }) {
   return (
     <div className="sliding-text-container">
@@ -41,8 +40,7 @@ function WordleChatPanel({ onWordParsed, darkMode }) {
   const [promptResult, setPromptResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const { sessionId, refreshChat } = useApp();
-  const WORKSPACE_SLUG = "deepseek";
+  const { refreshChat } = useApp();
 
   const parseWord = (response) => {
     if (!response) return "";
@@ -65,13 +63,9 @@ function WordleChatPanel({ onWordParsed, darkMode }) {
 
     setLoading(true);
     try {
-      const data = await sendOllamaChat(WORKSPACE_SLUG, {
-        message: prompt,
-        sessionId: sessionId
-      });
-
-      if (data?.textResponse) {
-        const responseText = data.textResponse;
+      const data = await sendOllamaChat(prompt);
+      if (data?.response) {
+        const responseText = data.response;
         setPromptResult(responseText);
 
         const parsed = parseWord(responseText);
@@ -98,7 +92,6 @@ function WordleChatPanel({ onWordParsed, darkMode }) {
     setTimeout(() => setIsRefreshing(false), 1000);
   };
 
-  // Genel panel stili
   const panelStyle = {
     flex: 1,
     padding: "40px",
@@ -111,12 +104,10 @@ function WordleChatPanel({ onWordParsed, darkMode }) {
     height: "100%",
   };
 
-  // Girdi ve butonların bulunduğu bölüm
   const inputSectionStyle = {
     marginBottom: "24px",
   };
 
-  // Textarea stili
   const textareaStyle = {
     width: "100%",
     height: "160px",
@@ -134,7 +125,6 @@ function WordleChatPanel({ onWordParsed, darkMode }) {
     fontFamily: "inherit",
   };
 
-  // Buton stili (Send butonu için)
   const buttonStyle = {
     padding: "14px 28px",
     cursor: "pointer",
@@ -145,10 +135,9 @@ function WordleChatPanel({ onWordParsed, darkMode }) {
     fontWeight: "600",
     fontSize: "18px",
     transition: "background-color 0.2s",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)"
+    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
   };
 
-  // Refresh butonu stili
   const refreshButtonStyle = {
     padding: "14px 28px",
     cursor: "pointer",
@@ -161,10 +150,9 @@ function WordleChatPanel({ onWordParsed, darkMode }) {
     transition: "background-color 0.2s",
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
     marginLeft: "10px",
-    animation: isRefreshing ? "blink 1s infinite" : "none"
+    animation: isRefreshing ? "blink 1s infinite" : "none",
   };
 
-  // Cevap (response) alanı stili
   const responseAreaStyle = {
     flex: 1,
     padding: "20px",
@@ -185,7 +173,7 @@ function WordleChatPanel({ onWordParsed, darkMode }) {
           fontSize: "28px",
           fontWeight: "700",
           color: darkMode ? "#e2e8f0" : "#1e293b",
-          marginBottom: "24px"
+          marginBottom: "24px",
         }}
       >
         Chat Panel
@@ -205,11 +193,7 @@ function WordleChatPanel({ onWordParsed, darkMode }) {
           }
         />
         <div style={{ display: "flex", alignItems: "center" }}>
-          <button
-            onClick={handlePromptSubmit}
-            style={buttonStyle}
-            disabled={loading}
-          >
+          <button onClick={handlePromptSubmit} style={buttonStyle} disabled={loading}>
             {loading ? "Waiting for Response..." : "Send"}
           </button>
           <button onClick={handleRefresh} style={refreshButtonStyle}>
@@ -218,8 +202,6 @@ function WordleChatPanel({ onWordParsed, darkMode }) {
           </button>
         </div>
       </div>
-
-      {/* Cevap alanı */}
       <div style={responseAreaStyle}>
         {loading ? (
           <SlidingText text="Awaiting response..." />

@@ -7,7 +7,6 @@ const ChatComponent = () => {
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const workspaceSlug = "deepseek";
 
   const handleSendPrompt = async () => {
     if (!prompt.trim()) {
@@ -17,13 +16,9 @@ const ChatComponent = () => {
 
     setIsLoading(true);
     try {
-      const data = await sendOllamaChat(workspaceSlug, {
-        message: prompt,
-        sessionId: sessionId,
-      });
-
-      if (data?.textResponse) {
-        setResponse(data.textResponse);
+      const data = await sendOllamaChat(prompt);
+      if (data?.response) {
+        setResponse(data.response);
       } else if (data?.error) {
         setResponse(`Hata: ${data.error}`);
       }
