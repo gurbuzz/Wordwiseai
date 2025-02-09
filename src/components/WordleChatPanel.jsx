@@ -5,7 +5,7 @@ import { useApp } from "../context/AppContext";
 import ChatInput from "./ChatInput";
 import ChatOutput from "./ChatOutput";
 
-const WordleChatPanel = ({ onWordParsed, darkMode }) => {
+const WordleChatPanel = ({ onWordParsed, darkMode, gameOver }) => {
   const [prompt, setPrompt] = useState("");
   const [promptResult, setPromptResult] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,14 +22,14 @@ const WordleChatPanel = ({ onWordParsed, darkMode }) => {
   };
 
   const handleTextareaKeyDown = (e) => {
-    if (e.key === "Enter" && !e.shiftKey && !loading) {
+    if (e.key === "Enter" && !e.shiftKey && !loading && !gameOver) {
       e.preventDefault();
       handlePromptSubmit();
     }
   };
 
   const handlePromptSubmit = async () => {
-    if (loading || !prompt.trim()) return;
+    if (loading || !prompt.trim() || gameOver) return;
     setLoading(true);
     try {
       const data = await sendOllamaChat(prompt);
@@ -53,6 +53,7 @@ const WordleChatPanel = ({ onWordParsed, darkMode }) => {
   };
 
   const handleRefresh = () => {
+    if (gameOver) return;
     setIsRefreshing(true);
     refreshChat();
     setTimeout(() => setIsRefreshing(false), 1000);
@@ -91,6 +92,7 @@ const WordleChatPanel = ({ onWordParsed, darkMode }) => {
         loading={loading}
         isRefreshing={isRefreshing}
         darkMode={darkMode}
+        disabled={gameOver}
       />
       <ChatOutput promptResult={promptResult} loading={loading} darkMode={darkMode} />
     </div>

@@ -5,29 +5,13 @@ import AiModelPanel from "../components/AiModelPanel";
 import WordleChatPanel from "../components/WordleChatPanel";
 import WordleBoard from "../components/WordleBoard";
 import SettingsPanel from "../components/SettingsPanel";
+import ResultPanel from "../components/ResultPanel";
 
-function ResultPanel({ promptCount, attemptCount, onRestart, darkMode }) {
+export default function Home() {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div
-        className={`p-10 rounded-lg text-center ${
-          darkMode
-            ? "bg-gray-800 bg-opacity-90 text-white"
-            : "bg-white bg-opacity-90 text-gray-900"
-        }`}
-      >
-        <h2 className="text-2xl font-bold mb-4">Congratulations!</h2>
-        <p className="mb-2">You found the correct word.</p>
-        <p className="mb-2">Prompts Sent: {promptCount}</p>
-        <p className="mb-4">Word Attempts: {attemptCount}</p>
-        <button
-          onClick={onRestart}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Play Again
-        </button>
-      </div>
-    </div>
+    <AppProvider>
+      <HomeContent />
+    </AppProvider>
   );
 }
 
@@ -49,6 +33,10 @@ function HomeContent() {
   const [promptCount, setPromptCount] = useState(0);
   const [attemptCount, setAttemptCount] = useState(0);
   const [gameWon, setGameWon] = useState(false);
+
+  const closeResultPanel = () => {
+    setGameWon(false);
+  };
 
   const checkRow = (rowIndex, rowLettersParam) => {
     const rowLetters = rowLettersParam || guesses[rowIndex];
@@ -75,8 +63,8 @@ function HomeContent() {
       }
     });
 
-    setColors((prevColors) => {
-      const newColors = prevColors.map((row) => [...row]);
+    setColors((prev) => {
+      const newColors = prev.map((row) => [...row]);
       newColors[rowIndex] = rowResult;
       return newColors;
     });
@@ -86,43 +74,19 @@ function HomeContent() {
     if (currentRow < 5 && !gameWon) {
       setPromptCount((prev) => prev + 1);
       setAttemptCount((prev) => prev + 1);
-
       const updatedGuesses = [...guesses];
       updatedGuesses[currentRow] = letters;
       setGuesses(updatedGuesses);
       checkRow(currentRow, letters);
-
       if (letters.join("") === solution) {
         setGameWon(true);
       }
-
       setCurrentRow(currentRow + 1);
     }
   };
 
-  const resetGame = () => {
-    setGuesses(
-      Array(5)
-        .fill("")
-        .map(() => Array(5).fill(""))
-    );
-    setColors(
-      Array(5)
-        .fill("")
-        .map(() => Array(5).fill("WHITE"))
-    );
-    setCurrentRow(0);
-    setPromptCount(0);
-    setAttemptCount(0);
-    setGameWon(false);
-  };
-
   return (
-    <div
-      className={`h-screen flex flex-col ${
-        darkMode ? "bg-gray-900" : "bg-gray-50"
-      }`}
-    >
+    <div className={`h-screen flex flex-col ${darkMode ? "bg-gray-900" : "bg-gray-50"}`}>
       <main className="flex-1 pt-20">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10 py-10">
           <div className="flex flex-col lg:flex-row gap-10">
@@ -130,14 +94,14 @@ function HomeContent() {
               <AiModelPanel />
             </div>
             <div className="lg:w-1/3">
-              <WordleChatPanel onWordParsed={handleWordParsed} darkMode={darkMode} />
+              <WordleChatPanel
+                onWordParsed={handleWordParsed}
+                darkMode={darkMode}
+                gameOver={gameWon}
+              />
             </div>
             <div className="lg:w-1/2">
-              <WordleBoard
-                guesses={guesses}
-                colors={colors}
-                darkMode={darkMode}
-              />
+              <WordleBoard guesses={guesses} colors={colors} darkMode={darkMode} />
             </div>
           </div>
         </div>
@@ -147,18 +111,10 @@ function HomeContent() {
         <ResultPanel
           promptCount={promptCount}
           attemptCount={attemptCount}
-          onRestart={resetGame}
+          onRestart={closeResultPanel}
           darkMode={darkMode}
         />
       )}
     </div>
-  );
-}
-
-export default function Home() {
-  return (
-    <AppProvider>
-      <HomeContent />
-    </AppProvider>
   );
 }

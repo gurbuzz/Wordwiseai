@@ -9,6 +9,7 @@ const ChatInput = ({
   loading,
   isRefreshing,
   darkMode,
+  disabled,
 }) => {
   const textareaStyle = {
     width: "100%",
@@ -16,7 +17,11 @@ const ChatInput = ({
     marginBottom: "20px",
     padding: "16px",
     borderRadius: "12px",
-    border: darkMode ? "1px solid #4b5563" : "1px solid #e2e8f0",
+    border: disabled
+      ? "1px solid #ccc"
+      : darkMode
+      ? "1px solid #4b5563"
+      : "1px solid #e2e8f0",
     fontSize: "18px",
     resize: "none",
     outline: "none",
@@ -29,8 +34,12 @@ const ChatInput = ({
 
   const buttonStyle = {
     padding: "14px 28px",
-    cursor: "pointer",
-    backgroundColor: loading ? "#94a3b8" : (darkMode ? "#2563eb" : "#3b82f6"),
+    cursor: disabled ? "not-allowed" : "pointer",
+    backgroundColor: loading || disabled
+      ? "#94a3b8"
+      : darkMode
+      ? "#2563eb"
+      : "#3b82f6",
     color: "#fff",
     border: "none",
     borderRadius: "12px",
@@ -42,8 +51,12 @@ const ChatInput = ({
 
   const refreshButtonStyle = {
     padding: "14px 28px",
-    cursor: "pointer",
-    backgroundColor: loading ? "#94a3b8" : (darkMode ? "#2563eb" : "#3b82f6"),
+    cursor: loading || disabled ? "not-allowed" : "pointer",
+    backgroundColor: loading
+      ? "#94a3b8"
+      : darkMode
+      ? "#2563eb"
+      : "#3b82f6",
     color: "#fff",
     border: "none",
     borderRadius: "12px",
@@ -63,19 +76,28 @@ const ChatInput = ({
         onKeyDown={onTextareaKeyDown}
         placeholder="Enter your guess here..."
         style={textareaStyle}
+        disabled={disabled}
         onFocus={(e) =>
-          (e.target.style.borderColor = darkMode ? "#3b82f6" : "#3b82f6")
+          (e.target.style.borderColor = disabled
+            ? "#ccc"
+            : darkMode
+            ? "#3b82f6"
+            : "#3b82f6")
         }
         onBlur={(e) =>
-          (e.target.style.borderColor = darkMode ? "#4b5563" : "#e2e8f0")
+          (e.target.style.borderColor = disabled
+            ? "#ccc"
+            : darkMode
+            ? "#4b5563"
+            : "#e2e8f0")
         }
       />
       <div style={{ display: "flex", alignItems: "center" }}>
-        <button onClick={onSend} style={buttonStyle} disabled={loading}>
+        <button onClick={onSend} style={buttonStyle} disabled={loading || disabled}>
           {loading ? "Waiting for Response..." : "Send"}
         </button>
-        <button onClick={onRefresh} style={refreshButtonStyle}>
-          Refresh 
+        <button onClick={onRefresh} style={refreshButtonStyle} disabled={disabled}>
+          Refresh
           {isRefreshing && <span className="spinner" />}
         </button>
       </div>
