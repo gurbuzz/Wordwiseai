@@ -11,7 +11,6 @@ const models = [
 
 const AiModelPanel = () => {
   const [selectedModel, setSelectedModel] = useState("Llama");
-  const [responseTime, setResponseTime] = useState(null);
 
   const handleModelChange = (e) => {
     setSelectedModel(e.target.value);
@@ -59,9 +58,6 @@ const AiModelPanel = () => {
       </select>
       <div style={infoStyle}>
         <strong>Selected Model:</strong> {selectedModel}
-      </div>
-      <div style={{ marginTop: "10px", ...infoStyle }}>
-        <strong>Response Time:</strong> {responseTime !== null ? `${responseTime} ms` : "N/A"}
       </div>
     </div>
   );
