@@ -8,6 +8,7 @@ import WordleBoard from "../components/WordleBoard";
 import SettingsPanel from "../components/SettingsPanel";
 import ResultPanel from "../components/ResultPanel";
 import GameOverPanel from "../components/GameOverPanel";
+import WelcomePanel from "../components/WelcomePanel"; // Yeni eklenen panel
 
 export default function Home() {
   return (
@@ -19,6 +20,9 @@ export default function Home() {
 
 function HomeContent() {
   const { darkMode } = useApp();
+
+  // İlk girişte WelcomePanel'in gösterilmesi için state
+  const [showWelcome, setShowWelcome] = useState(true);
 
   // Wordle için gerekli state'ler
   const [guesses, setGuesses] = useState(
@@ -44,7 +48,7 @@ function HomeContent() {
   const [gameWon, setGameWon] = useState(false);
   const [gameLost, setGameLost] = useState(false);
 
-  // Panelleri yalnızca kapatmak için fonksiyonlar (oyun state'i korunuyor)
+  // Panelleri sadece kapatmak (oyun state'i resetlenmiyor)
   const closeWinPanel = () => {
     setGameWon(false);
   };
@@ -94,30 +98,23 @@ function HomeContent() {
    * Yapay zekadan gelen 5 harfli tahmini yakalayan fonksiyon.
    */
   const handleWordParsed = (letters) => {
-    // Oyun bitmediyse ve hâlâ 5 deneme hakkımız varsa
     if (currentRow < 5 && !gameWon && !gameLost) {
-      // prompt/tahmin istatistiklerini güncelle
       setPromptCount((prev) => prev + 1);
       setAttemptCount((prev) => prev + 1);
 
-      // guesses array'ini güncelle
       const updatedGuesses = [...guesses];
       updatedGuesses[currentRow] = letters;
       setGuesses(updatedGuesses);
 
-      // renk kontrolü
       checkRow(currentRow, letters);
 
-      // doğru kelimeyse
       if (letters.join("") === solution) {
         setGameWon(true);
       }
 
-      // bir sonrakine geç
       const nextRow = currentRow + 1;
       setCurrentRow(nextRow);
 
-      // 5. denemeden sonra hala doğru tahmin edilmediyse
       if (nextRow === 5 && letters.join("") !== solution) {
         setGameLost(true);
       }
@@ -169,6 +166,11 @@ function HomeContent() {
           onClose={closeLosePanel}
           darkMode={darkMode}
         />
+      )}
+
+      {/* İlk girişte gösterilecek WelcomePanel */}
+      {showWelcome && (
+        <WelcomePanel onPlay={() => setShowWelcome(false)} darkMode={darkMode} />
       )}
     </div>
   );
