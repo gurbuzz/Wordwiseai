@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 
-function ResultPanel({ promptCount, attemptCount, onClose, darkMode }) {
+function GameOverPanel({ solution, promptCount, attemptCount, onClose, darkMode }) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div
@@ -11,8 +11,11 @@ function ResultPanel({ promptCount, attemptCount, onClose, darkMode }) {
             : "bg-white/70 text-gray-900"
         }`}
       >
-        <h2 className="text-2xl font-bold mb-4">Congratulations!</h2>
-        <p className="mb-2">You found the correct word.</p>
+        <h2 className="text-2xl font-bold mb-4">Game Over!</h2>
+        <p className="mb-2">You ran out of tries.</p>
+        <p className="mb-2">
+          The correct word was: <strong>{solution}</strong>
+        </p>
         <p className="mb-2">Prompts Sent: {promptCount}</p>
         <p className="mb-4">Word Attempts: {attemptCount}</p>
         <button
@@ -26,4 +29,4 @@ function ResultPanel({ promptCount, attemptCount, onClose, darkMode }) {
   );
 }
 
-export default ResultPanel;
+export default GameOverPanel;
