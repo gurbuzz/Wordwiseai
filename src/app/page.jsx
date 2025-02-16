@@ -1,21 +1,16 @@
 "use client";
 import React, { useState } from "react";
-import { AppProvider, useApp } from "../context/AppContext";
+import { useApp } from "../context/AppContext";
 
 import AiModelPanel from "../components/AiModelPanel";
 import WordleChatPanel from "../components/WordleChatPanel";
 import WordleBoard from "../components/WordleBoard";
-import SettingsPanel from "../components/SettingsPanel";
 import ResultPanel from "../components/ResultPanel";
 import GameOverPanel from "../components/GameOverPanel";
-import WelcomePanel from "../components/WelcomePanel"; // Yeni eklenen panel
+import WelcomePanel from "../components/WelcomePanel";
 
 export default function Home() {
-  return (
-    <AppProvider>
-      <HomeContent />
-    </AppProvider>
-  );
+  return <HomeContent />;
 }
 
 function HomeContent() {
@@ -147,8 +142,6 @@ function HomeContent() {
           </div>
         </div>
       </main>
-
-      <SettingsPanel />
 
       {gameWon && (
         <ResultPanel

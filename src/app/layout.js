@@ -17,10 +17,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      {/* Dark mode yönetimini AppProvider üzerinden sağlıyorsak, 
+          dark moddaysa body ya da html elementine .dark eklenmeli */}
       <body className={`${montserrat.className} antialiased`}>
         <AppProvider>
           <Navbar />
-          {/* SettingsPanel global olarak ekleniyor */}
           <SettingsPanel />
           {children}
         </AppProvider>

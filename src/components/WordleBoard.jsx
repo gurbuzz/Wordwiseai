@@ -4,14 +4,13 @@ import React, { useState, useEffect } from "react";
 const colorMap = {
   GREEN: "#22c55e",   // Yeşil
   YELLOW: "#facc15",  // Sarı
-  WHITE: "#ffffff",   // Beyaz
+  // "WHITE" mapping'ini kaldırdık, çünkü boş hücrelerde dark mode kontrolünü ayrı yapacağız.
 };
 
 function AnimatedCell({ letter, colorKey, delay, darkMode }) {
   const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
-    // Her yeni harf geldiğinde animasyonu sıfırla
     setRevealed(false);
     const timer = setTimeout(() => {
       setRevealed(true);
@@ -19,9 +18,14 @@ function AnimatedCell({ letter, colorKey, delay, darkMode }) {
     return () => clearTimeout(timer);
   }, [letter, delay]);
 
-  // Finalde uygulanacak arka plan rengi
-  const finalBgColor = colorMap[colorKey] || (darkMode ? "#1e293b" : "#ffffff");
-  // Başlangıç rengi: burada, örneğin, henüz açılmamışsa mevcut arka plan kullanılıyor
+  // Eğer colorKey "WHITE" ise (yani renklendirme yoksa) dark mode durumuna göre ayarla.
+  const finalBgColor =
+    colorKey === "WHITE"
+      ? darkMode
+        ? "#1e293b"
+        : "#ffffff"
+      : colorMap[colorKey] || (darkMode ? "#1e293b" : "#ffffff");
+
   const initialBgColor = darkMode ? "#1e293b" : "#ffffff";
 
   const cellStyle = {
@@ -34,10 +38,8 @@ function AnimatedCell({ letter, colorKey, delay, darkMode }) {
     fontWeight: "700",
     border: darkMode ? "2px solid #374151" : "2px solid #e2e8f0",
     borderRadius: "12px",
-    // Delay tamamlanana kadar başlangıç rengi, sonra final rengi
     background: revealed ? finalBgColor : initialBgColor,
     color: darkMode ? "#e2e8f0" : "#1e293b",
-    // Hem arka plan rengi hem de içerik opacity animasyonu
     transition: "opacity 0.5s ease, background-color 0.5s ease",
     opacity: revealed ? 1 : 0,
     fontFamily: "inherit",
@@ -84,7 +86,6 @@ function WordleBoard({ guesses, colors, darkMode }) {
             }}
           >
             {row.map((letter, colIndex) => {
-              // Her kutu için delay, örn: 0ms, 300ms, 600ms, ...
               const delay = colIndex * 300;
               return (
                 <AnimatedCell

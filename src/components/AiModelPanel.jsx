@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import { useApp } from "../context/AppContext";
 
 const models = [
   { name: "Llama", active: true },
@@ -10,6 +11,7 @@ const models = [
 ];
 
 const AiModelPanel = () => {
+  const { darkMode } = useApp();
   const [selectedModel, setSelectedModel] = useState("Llama");
 
   const handleModelChange = (e) => {
@@ -18,7 +20,7 @@ const AiModelPanel = () => {
 
   const panelStyle = {
     padding: "40px",
-    backgroundColor: "#ffffff",
+    backgroundColor: darkMode ? "#1e293b" : "#ffffff",
     boxShadow: "0 6px 12px rgba(0, 0, 0, 0.08)",
     borderRadius: "12px",
     marginBottom: "20px",
@@ -27,7 +29,7 @@ const AiModelPanel = () => {
   const headingStyle = {
     fontSize: "28px",
     fontWeight: "700",
-    color: "#1e293b",
+    color: darkMode ? "#e2e8f0" : "#1e293b",
     marginBottom: "28px",
   };
 
@@ -36,14 +38,16 @@ const AiModelPanel = () => {
     padding: "12px",
     fontSize: "18px",
     borderRadius: "8px",
-    border: "1px solid #e2e8f0",
+    border: darkMode ? "1px solid #374151" : "1px solid #e2e8f0",
     marginBottom: "20px",
+    backgroundColor: darkMode ? "#1e293b" : "#ffffff",
+    color: darkMode ? "#e2e8f0" : "#1e293b",
   };
 
   const infoStyle = {
     fontSize: "18px",
     fontWeight: "500",
-    color: "#1e293b",
+    color: darkMode ? "#e2e8f0" : "#1e293b",
   };
 
   return (
