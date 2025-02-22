@@ -13,10 +13,25 @@ function WelcomePanel({ onPlay, darkMode }) {
       >
         <h2 className="text-2xl font-bold mb-4">Welcome to WordWise AI</h2>
         <p className="mb-4">
-           WordWise AI is an artificial intelligence-powered Wordle game. The logic of the game is based on guessing the 5-letter word in the correct order. With each guess, the correct letters are shown in the correct position (GREEN) and the correct letters in the wrong position (YELLOW). The AI ​​gives you clues via chat.
-        </p>    
+          WordWise AI is a daily AI-powered word-guessing challenge. Each day, 
+          there's a single secret word determined by the server. You have a 
+          limited number of attempts to guess it, and each guess counts as a 
+          prompt. The fewer prompts and attempts you use, the higher your 
+          position on the leaderboard.
+        </p>
         <p className="mb-4">
-           This game aims to compare artificial intelligence models and teach how to enter prompts.
+          With each guess, letters in the correct position are shown in 
+          <span className="font-bold text-green-600"> GREEN</span>, and 
+          correct letters in the wrong position appear in 
+          <span className="font-bold text-yellow-500"> YELLOW</span>. 
+          Letters not in the word are shown in gray. Our AI can provide hints 
+          to guide you through the game.
+        </p>
+        <p className="mb-4">
+          Whether you're logged in or just playing as a guest, you can enjoy 
+          the puzzle. However, only registered users can permanently save 
+          stats and compete for the top ranks. Have fun exploring different AI 
+          models and see how they help improve your guessing strategy.
         </p>
         <div className="flex justify-center gap-4">
           <button
