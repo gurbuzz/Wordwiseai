@@ -1,9 +1,10 @@
+"use client";
 import React, { useState } from "react";
-import { sendOllamaChat, log } from "../services/chatService";
+import { sendChatRequest, log } from "../services/chatService";
 import { useApp } from "../context/AppContext";
 
 const ChatComponent = () => {
-  const { sessionId } = useApp();
+  const { sessionId, selectedModel } = useApp();
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -16,7 +17,8 @@ const ChatComponent = () => {
 
     setIsLoading(true);
     try {
-      const data = await sendOllamaChat(prompt);
+      // Seçili modele göre API çağrısı
+      const data = await sendChatRequest(selectedModel, prompt);
       if (data?.response) {
         setResponse(data.response);
       } else if (data?.error) {

@@ -10,6 +10,9 @@ export function AppProvider({ children }) {
   const [showSettings, setShowSettings] = useState(false);
   const [sessionId, setSessionId] = useState(uuidv4());
 
+  // Model seçimi için state
+  const [selectedModel, setSelectedModel] = useState("Llama");
+
   const refreshChat = () => {
     setSessionId(uuidv4());
   };
@@ -25,6 +28,9 @@ export function AppProvider({ children }) {
         setShowSettings,
         sessionId,
         refreshChat,
+        selectedModel,
+        setSelectedModel,
+        
       }}
     >
       {children}

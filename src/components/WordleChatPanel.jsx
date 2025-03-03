@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { sendOllamaChat, log } from "../services/chatService";
+// Ollama yerine bu sefer sendChatRequest'i import ediyoruz
+import { sendChatRequest, log } from "../services/chatService";
 import { useApp } from "../context/AppContext";
 import ChatInput from "./ChatInput";
 import ChatOutput from "./ChatOutput";
@@ -10,8 +11,11 @@ const WordleChatPanel = ({ onWordParsed, darkMode, gameOver }) => {
   const [promptResult, setPromptResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const { refreshChat } = useApp();
 
+  // AppContext'ten refreshChat ve selectedModel'i alıyoruz
+  const { refreshChat, selectedModel } = useApp();
+
+  // Ollama veya Gemini cevabını Wordle mantığına uygun parse edecek fonksiyon
   const parseWord = (response) => {
     if (!response) return "";
     let trimmed = response.trim();
@@ -21,6 +25,7 @@ const WordleChatPanel = ({ onWordParsed, darkMode, gameOver }) => {
     return trimmed;
   };
 
+  // Enter'a basınca otomatik gönderim
   const handleTextareaKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey && !loading && !gameOver) {
       e.preventDefault();
@@ -28,21 +33,46 @@ const WordleChatPanel = ({ onWordParsed, darkMode, gameOver }) => {
     }
   };
 
+  // Asıl chat gönderim fonksiyonu
   const handlePromptSubmit = async () => {
     if (loading || !prompt.trim() || gameOver) return;
     setLoading(true);
     try {
-      const data = await sendOllamaChat(prompt);
-      if (data?.response) {
-        const responseText = data.response;
-        setPromptResult(responseText);
-        const parsed = parseWord(responseText);
-        if (parsed.length === 5) {
-          onWordParsed(parsed.toUpperCase().split(""));
-          setPrompt("");
+      // Seçilen modele göre Ollama veya Gemini API çağrısı
+      const data = await sendChatRequest(selectedModel, prompt);
+
+      // Loglayalım ki ham veriyi görelim
+      console.log("Ham veri:", data);
+
+      // Ortak bir yanıt değişkeni
+      let responseText = "";
+
+      if (selectedModel === "Gemini") {
+        // Gemini yanıt yapısı -> candidates[0].content.parts[0].text
+        const candidate = data?.candidates?.[0];
+        if (candidate?.content?.parts?.[0]?.text) {
+          responseText = candidate.content.parts[0].text;
+        } else {
+          responseText = "Gemini’den beklenmeyen yapı veya boş yanıt.";
         }
-      } else if (data?.error) {
-        setPromptResult(`Error: ${data.error}`);
+      } else {
+        // Ollama (ya da başka model) -> data.response
+        if (data?.response) {
+          responseText = data.response;
+        } else if (data?.error) {
+          responseText = `Error: ${data.error}`;
+        } else {
+          responseText = "Ollama’dan beklenmeyen yapı veya boş yanıt.";
+        }
+      }
+
+      setPromptResult(responseText);
+
+      // Wordle mantığı: 5 harfli kelimeyse onWordParsed
+      const parsed = parseWord(responseText);
+      if (parsed.length === 5) {
+        onWordParsed(parsed.toUpperCase().split(""));
+        setPrompt("");
       }
     } catch (error) {
       setPromptResult(error.message || "An error occurred. Please try again.");
@@ -52,6 +82,7 @@ const WordleChatPanel = ({ onWordParsed, darkMode, gameOver }) => {
     }
   };
 
+  // Chat'i yenile
   const handleRefresh = () => {
     if (gameOver) return;
     setIsRefreshing(true);
@@ -59,6 +90,7 @@ const WordleChatPanel = ({ onWordParsed, darkMode, gameOver }) => {
     setTimeout(() => setIsRefreshing(false), 1000);
   };
 
+  // Senin eski stil ayarlarını aynen koruyoruz
   const panelStyle = {
     flex: 1,
     padding: "40px",
@@ -94,7 +126,11 @@ const WordleChatPanel = ({ onWordParsed, darkMode, gameOver }) => {
         darkMode={darkMode}
         disabled={gameOver}
       />
-      <ChatOutput promptResult={promptResult} loading={loading} darkMode={darkMode} />
+      <ChatOutput
+        promptResult={promptResult}
+        loading={loading}
+        darkMode={darkMode}
+      />
     </div>
   );
 };
