@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useApp } from "../context/AppContext";
+import { WORDS } from "../data/words";
 
 import AiModelPanel from "../components/AiModelPanel";
 import WordleChatPanel from "../components/WordleChatPanel";
@@ -31,9 +32,12 @@ function HomeContent() {
       .map(() => Array(5).fill("WHITE"))
   );
   const [currentRow, setCurrentRow] = useState(0);
+  const [solution, setSolution] = useState("");
 
-  // Örnek çözüm kelimesi
-  const solution = "CLEAN";
+  useEffect(() => {
+    const randomWord = WORDS[Math.floor(Math.random() * WORDS.length)];
+    setSolution(randomWord);
+  }, []);
 
   // İstatistik için state'ler
   const [promptCount, setPromptCount] = useState(0);
